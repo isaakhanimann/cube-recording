@@ -25,7 +25,7 @@ public class UIRecorderFunctions : MonoBehaviour
 
     private void InstantiateRecordingRepresentation()
     {
-        Debug.Log("InstantiateRecordingRepresentationAtPalm");
+        Debug.Log("InstantiateRecordingRepresentation");
         Quaternion rotationToInstantiate = Quaternion.identity;
         Vector3 positionToInstantiate = Camera.main.transform.position + 0.5f * Vector3.forward;
         recordingRepresentationInstance = Instantiate(original: recordingRepresentationPrefab, position: positionToInstantiate, rotation: rotationToInstantiate);
