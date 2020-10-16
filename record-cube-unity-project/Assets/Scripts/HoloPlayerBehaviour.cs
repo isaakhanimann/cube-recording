@@ -44,12 +44,6 @@ public class HoloPlayerBehaviour : MonoBehaviour
         animatorOfInstance.SetTrigger("Play");
     }
 
-    public void SetInstanceOfRecordedObjectInactive()
-    {
-        instanceOfRecordedObject.SetActive(false);
-    }
-
-
     public void Pause()
     {
         Debug.Log("Pause is not implemented yet");
@@ -58,6 +52,7 @@ public class HoloPlayerBehaviour : MonoBehaviour
     public void Stop()
     {
         Debug.Log("Stop is not implemented yet");
+        instanceOfRecordedObject.SetActive(false);
     }
 
 }
