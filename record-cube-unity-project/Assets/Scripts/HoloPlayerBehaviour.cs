@@ -32,7 +32,7 @@ public class HoloPlayerBehaviour : MonoBehaviour
     private AnimatorOverrideController CreateAndSaveAnimatorOverrideController(string name)
     {
         AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(animatorOfInstance.runtimeAnimatorController);
-        AssetDatabase.CreateAsset(animatorOverrideController, $"Assets/Animation/AnimationOverrideControllers/AnimatorOverrideController{name}.overrideController");
+        AssetDatabase.CreateAsset(animatorOverrideController, $"Assets/Animation/AnimatorOverrideControllers/{name}.overrideController");
         AssetDatabase.SaveAssets();
         return animatorOverrideController;
     }
