@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
-
+using System.Collections;
 
 public class HoloPlayerBehaviour : MonoBehaviour
 {
@@ -9,6 +9,7 @@ public class HoloPlayerBehaviour : MonoBehaviour
     private GameObject instanceOfRecordedObject;
     private Animator animatorOfInstance;
     private AnimatorOverrideController animatorOverrideController;
+    private float lengthOfAnimationInSeconds;
 
     public void PutHoloRecordingIntoPlayer(HoloRecording holoRecording)
     {
@@ -18,6 +19,7 @@ public class HoloPlayerBehaviour : MonoBehaviour
         animatorOverrideController = CreateAndSaveAnimatorOverrideController(name: "AnimatorOverrideControllerFor" + holoRecording.animationClipName);
         animatorOverrideController["Recorded"] = holoRecording.animationClip;
         animatorOfInstance.runtimeAnimatorController = animatorOverrideController;
+        lengthOfAnimationInSeconds = holoRecording.animationClip.length;
     }
     private void InstantiateRecordedObjectAndSetInactive()
     {
@@ -37,12 +39,23 @@ public class HoloPlayerBehaviour : MonoBehaviour
         return animatorOverrideController;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Play();
+        }
+    }
+
     public void Play()
     {
         Debug.Log("Play");
         instanceOfRecordedObject.SetActive(true);
         animatorOfInstance.SetTrigger("Play");
+        //new WaitForSeconds(lengthOfAnimationInSeconds);
+        //instanceOfRecordedObject.SetActive(false);
     }
+
 
     public void Pause()
     {

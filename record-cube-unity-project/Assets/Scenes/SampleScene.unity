@@ -370,7 +370,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48797f7e579a0c44bb914c2a67af8151, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordingRepresentationPrefab: {fileID: 4664430308685063396, guid: c6722475fae0fe24eac9c47ea6701f43,
+  recordingRepresentationPrefab: {fileID: 2881357539079563393, guid: c6722475fae0fe24eac9c47ea6701f43,
     type: 3}
   holoRecorder: {fileID: 266643542}
 --- !u!4 &1624300296
