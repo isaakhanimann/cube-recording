@@ -13,9 +13,20 @@ public class HoloPlayerBehaviour : MonoBehaviour
     public void PutHoloRecordingIntoPlayer(HoloRecording holoRecording)
     {
         Debug.Log("PutHoloRecordingIntoPlayer");
+        InstantiateRecordedObjectAndSetInactive();
         // There needs to be an AnimatorOverrideController for every animation clip to be played on the object with the Animator
         animatorOverrideController = CreateAndSaveAnimatorOverrideController(name: "AnimatorOverrideControllerFor" + holoRecording.animationClipName);
         animatorOverrideController["Recorded"] = holoRecording.animationClip;
+        animatorOfInstance.runtimeAnimatorController = animatorOverrideController;
+    }
+    private void InstantiateRecordedObjectAndSetInactive()
+    {
+        Debug.Log("InstantiateRecordedObjectAndSetInactive");
+        Quaternion rotationToInstantiate = Quaternion.identity;
+        Vector3 positionToInstantiate = Camera.main.transform.position + 0.3f * Vector3.forward;
+        instanceOfRecordedObject = Instantiate(original: prefabOfRecordedObject, position: positionToInstantiate, rotation: rotationToInstantiate);
+        animatorOfInstance = instanceOfRecordedObject.GetComponent<Animator>();
+        instanceOfRecordedObject.SetActive(false);
     }
 
     private AnimatorOverrideController CreateAndSaveAnimatorOverrideController(string name)
@@ -29,20 +40,15 @@ public class HoloPlayerBehaviour : MonoBehaviour
     public void Play()
     {
         Debug.Log("Play");
-        InstantiateRecordedObject();
-        animatorOfInstance.runtimeAnimatorController = animatorOverrideController;
+        instanceOfRecordedObject.SetActive(true);
         animatorOfInstance.SetTrigger("Play");
-        Destroy(animatorOfInstance, 10.0f);
     }
 
-    private void InstantiateRecordedObject()
+    public void SetInstanceOfRecordedObjectInactive()
     {
-        Debug.Log("InstantiateRecordingRepresentation");
-        Quaternion rotationToInstantiate = Quaternion.identity;
-        Vector3 positionToInstantiate = Camera.main.transform.position + 0.3f * Vector3.forward;
-        instanceOfRecordedObject = Instantiate(original: prefabOfRecordedObject, position: positionToInstantiate, rotation: rotationToInstantiate);
-        animatorOfInstance = instanceOfRecordedObject.GetComponent<Animator>();
+        instanceOfRecordedObject.SetActive(false);
     }
+
 
     public void Pause()
     {
