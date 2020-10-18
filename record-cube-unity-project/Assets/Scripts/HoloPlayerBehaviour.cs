@@ -52,8 +52,14 @@ public class HoloPlayerBehaviour : MonoBehaviour
         Debug.Log("Play");
         instanceOfRecordedObject.SetActive(true);
         animatorOfInstance.SetTrigger("Play");
-        //new WaitForSeconds(lengthOfAnimationInSeconds);
-        //instanceOfRecordedObject.SetActive(false);
+        StartCoroutine(SetInstanceInactive());
+    }
+
+    IEnumerator SetInstanceInactive()
+    {
+        yield return new WaitForSeconds(lengthOfAnimationInSeconds);
+        instanceOfRecordedObject.SetActive(false);
+
     }
 
 
