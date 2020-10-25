@@ -11,27 +11,11 @@ public class HoloRecorderBehaviour : MonoBehaviour
 
     public GameObject objectToRecord;
 
-    private GameObjectRecorder gameObjectRecorder;
     private bool isRecording;
-    private AnimationClip currentlyRecordedAnimationClip;
-
-    private void Start()
-    {
-        InitializeRecorder();
-    }
-
-    public void InitializeRecorder()
-    {
-        Debug.Log("InitializeRecorder");
-        gameObjectRecorder = new GameObjectRecorder(objectToRecord);
-        gameObjectRecorder.BindComponentsOfType<Transform>(target: objectToRecord, recursive: true);
-    }
-
 
     public void StartRecording()
     {
         Debug.Log("StartRecording");
-        currentlyRecordedAnimationClip = new AnimationClip();
         isRecording = true;
     }
 
@@ -55,10 +39,10 @@ public class HoloRecorderBehaviour : MonoBehaviour
     {
         string animationClipName = "AnimationClip" + GetRandomNumberBetween1and100000();
         string pathToAnimationClip = $"Assets/Animation/AnimationClips/{animationClipName}.anim";
-        AssetDatabase.CreateAsset(currentlyRecordedAnimationClip, pathToAnimationClip);
+        AnimationClip recordedAnimationClip = GetAnimationClipFromRecordedKeyframes();
+        AssetDatabase.CreateAsset(recordedAnimationClip, pathToAnimationClip);
         AssetDatabase.SaveAssets();
-        gameObjectRecorder.SaveToClip(currentlyRecordedAnimationClip);
-        HoloRecording newRecording = new HoloRecording(currentlyRecordedAnimationClip, pathToAnimationClip, animationClipName);
+        HoloRecording newRecording = new HoloRecording(recordedAnimationClip, pathToAnimationClip, animationClipName);
         return newRecording;
     }
 
@@ -69,18 +53,45 @@ public class HoloRecorderBehaviour : MonoBehaviour
         return randomInt;
     }
 
-    private void ResetRecorder()
-    {
-        gameObjectRecorder.ResetRecording();
-        gameObjectRecorder.BindComponentsOfType<Transform>(objectToRecord, true);
-    }
-
     void LateUpdate()
     {
         if (isRecording)
         {
-            gameObjectRecorder.TakeSnapshot(Time.deltaTime);
+            CaptureKeyFrame();
         }
+    }
+
+    private float timeOfLastUpdate = 0.0f;
+    private List<Keyframe> translateXKeys = new List<Keyframe>();
+
+
+    private void CaptureKeyFrame()
+    {
+        float timeOfKeyFrame = timeOfLastUpdate + Time.deltaTime;
+        Keyframe newKey = new Keyframe(timeOfKeyFrame, objectToRecord.transform.localPosition.x);
+        translateXKeys.Add(newKey);
+        timeOfLastUpdate += Time.deltaTime;
+    }
+
+    private AnimationClip GetAnimationClipFromRecordedKeyframes()
+    {
+        Debug.Log($"{translateXKeys.Count} keyframes were recorded");
+        AnimationCurve translateX = new AnimationCurve(translateXKeys.ToArray());
+        // AnimationCurve translateY
+        // AnimationCurve translateZ
+        // AnimationCurve rotateX
+        // AnimationCurve rotateY
+        // AnimationCurve rotateZ
+        AnimationClip newClip = new AnimationClip();
+        newClip.SetCurve("", typeof(Transform), "localPosition.x", translateX);
+        return newClip;
+
+    }
+
+    private void ResetRecorder()
+    {
+        translateXKeys = new List<Keyframe>();
+        timeOfLastUpdate = 0.0f;
     }
 
 }

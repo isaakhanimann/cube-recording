@@ -13,7 +13,6 @@ public class UIRecorderFunctions : MonoBehaviour
     private void Start()
     {
         holoRecorderBehaviour = holoRecorder.GetComponent<HoloRecorderBehaviour>();
-        holoRecorderBehaviour.InitializeRecorder();
     }
 
     public void StartRecordingAndInstantiateRepresentation()
