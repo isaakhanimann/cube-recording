@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+
 
 //This needs to be a Monobehaviour because we need access to LateUpdate()
 public class HoloRecorderBehaviour : MonoBehaviour
@@ -38,13 +39,22 @@ public class HoloRecorderBehaviour : MonoBehaviour
     private HoloRecording SaveRecording()
     {
         string animationClipName = "AnimationClip" + GetRandomNumberBetween1and100000();
-        string pathToAnimationClip = $"Assets/Animation/AnimationClips/{animationClipName}.anim";
-        AnimationClip recordedAnimationClip = GetAnimationClipFromRecordedKeyframes();
-        AssetDatabase.CreateAsset(recordedAnimationClip, pathToAnimationClip);
-        AssetDatabase.SaveAssets();
-        HoloRecording newRecording = new HoloRecording(recordedAnimationClip, pathToAnimationClip, animationClipName);
+        string pathToAnimationClip = SaveKeyframes(animationClipName);
+        Debug.Log($"AnimationClip saved under {pathToAnimationClip}");
+        HoloRecording newRecording = new HoloRecording(pathToAnimationClip, animationClipName);
         return newRecording;
     }
+
+
+    private string SaveKeyframes(string filename)
+    {
+        string path = Application.persistentDataPath + $"/{filename}.txt";
+        AllKeyFrames allKeyFrames = new AllKeyFrames(translateXKeys);
+        string keyframesAsJson = JsonUtility.ToJson(allKeyFrames, true);
+        File.WriteAllText(path, keyframesAsJson);
+        return path;
+    }
+
 
     private int GetRandomNumberBetween1and100000()
     {
@@ -73,20 +83,6 @@ public class HoloRecorderBehaviour : MonoBehaviour
         timeOfLastUpdate += Time.deltaTime;
     }
 
-    private AnimationClip GetAnimationClipFromRecordedKeyframes()
-    {
-        Debug.Log($"{translateXKeys.Count} keyframes were recorded");
-        AnimationCurve translateX = new AnimationCurve(translateXKeys.ToArray());
-        // AnimationCurve translateY
-        // AnimationCurve translateZ
-        // AnimationCurve rotateX
-        // AnimationCurve rotateY
-        // AnimationCurve rotateZ
-        AnimationClip newClip = new AnimationClip();
-        newClip.SetCurve("", typeof(Transform), "localPosition.x", translateX);
-        return newClip;
-
-    }
 
     private void ResetRecorder()
     {

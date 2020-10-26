@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
-using UnityEditor;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class HoloPlayerBehaviour : MonoBehaviour
 {
@@ -8,7 +10,6 @@ public class HoloPlayerBehaviour : MonoBehaviour
 
     private GameObject instanceOfRecordedObject;
     private Animator animatorOfInstance;
-    private AnimatorOverrideController animatorOverrideController;
     private float lengthOfAnimationInSeconds;
 
     public void PutHoloRecordingIntoPlayer(HoloRecording holoRecording)
@@ -16,10 +17,11 @@ public class HoloPlayerBehaviour : MonoBehaviour
         Debug.Log("PutHoloRecordingIntoPlayer");
         InstantiateRecordedObjectAndSetInactive();
         // There needs to be an AnimatorOverrideController for every animation clip to be played on the object with the Animator
-        animatorOverrideController = CreateAndSaveAnimatorOverrideController(name: "AnimatorOverrideControllerFor" + holoRecording.animationClipName);
-        animatorOverrideController["Recorded"] = holoRecording.animationClip;
+        AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(animatorOfInstance.runtimeAnimatorController);
+        AnimationClip animationClip = GetAnimationClipFromPath(holoRecording.pathToAnimationClip);
+        animatorOverrideController["Recorded"] = animationClip;
         animatorOfInstance.runtimeAnimatorController = animatorOverrideController;
-        lengthOfAnimationInSeconds = holoRecording.animationClip.length;
+        lengthOfAnimationInSeconds = animationClip.length;
     }
     private void InstantiateRecordedObjectAndSetInactive()
     {
@@ -29,14 +31,6 @@ public class HoloPlayerBehaviour : MonoBehaviour
         instanceOfRecordedObject = Instantiate(original: prefabOfRecordedObject, position: positionToInstantiate, rotation: rotationToInstantiate);
         animatorOfInstance = instanceOfRecordedObject.GetComponent<Animator>();
         instanceOfRecordedObject.SetActive(false);
-    }
-
-    private AnimatorOverrideController CreateAndSaveAnimatorOverrideController(string name)
-    {
-        AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(animatorOfInstance.runtimeAnimatorController);
-        AssetDatabase.CreateAsset(animatorOverrideController, $"Assets/Animation/AnimatorOverrideControllers/{name}.overrideController");
-        AssetDatabase.SaveAssets();
-        return animatorOverrideController;
     }
 
     private void Update()
@@ -72,6 +66,28 @@ public class HoloPlayerBehaviour : MonoBehaviour
     {
         Debug.Log("Stop is not implemented yet");
         instanceOfRecordedObject.SetActive(false);
+    }
+
+    private AnimationClip GetAnimationClipFromPath(string path)
+    {
+        List<Keyframe> keyframes = LoadKeyframes(path);
+        return GetAnimationClipFromRecordedKeyframes(keyframes);
+    }
+
+    private List<Keyframe> LoadKeyframes(string path)
+    {
+        string keyframesAsJson = File.ReadAllText(path);
+        AllKeyFrames allKeyFrames = JsonUtility.FromJson<AllKeyFrames>(keyframesAsJson);
+        return allKeyFrames.GetKeyframes();
+    }
+
+    private AnimationClip GetAnimationClipFromRecordedKeyframes(List<Keyframe> translateXKeys)
+    {
+        AnimationCurve translateX = new AnimationCurve(translateXKeys.ToArray());
+        AnimationClip newClip = new AnimationClip();
+        newClip.SetCurve("", typeof(Transform), "localPosition.x", translateX);
+        return newClip;
+
     }
 
 }
