@@ -3,6 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.Input;
+using Microsoft.MixedReality.Toolkit.Utilities;
+using System.Collections;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 
 public class HoloPlayerBehaviour : MonoBehaviour
 {
@@ -70,8 +77,10 @@ public class HoloPlayerBehaviour : MonoBehaviour
 
     private AnimationClip GetAnimationClipFromPath(string path)
     {
-        List<Keyframe> keyframes = LoadKeyframes(path);
-        return GetAnimationClipFromRecordedKeyframes(keyframes);
+        List<Keyframe> keyframes_root = LoadKeyframes("1" + path);
+        List<Keyframe> keyframes_child = LoadKeyframes("2" + path);
+
+        return GetAnimationClipFromRecordedKeyframes(keyframes_root, keyframes_child);
     }
 
     private List<Keyframe> LoadKeyframes(string path)
@@ -81,13 +90,16 @@ public class HoloPlayerBehaviour : MonoBehaviour
         return allKeyFrames.GetKeyframes();
     }
 
-    private AnimationClip GetAnimationClipFromRecordedKeyframes(List<Keyframe> translateXKeys)
+    private AnimationClip GetAnimationClipFromRecordedKeyframes(List<Keyframe> translateXKeys, List<Keyframe> translateXKeysChild)
     {
-        AnimationCurve translateX = new AnimationCurve(translateXKeys.ToArray());
         AnimationClip newClip = new AnimationClip();
-        newClip.SetCurve("", typeof(Transform), "localPosition.x", translateX);
+           
+        AnimationCurve translateX = new AnimationCurve(translateXKeys.ToArray());
+        newClip.SetCurve("HandRig_L", typeof(Transform), "localPosition.x", translateX);
+    
+        AnimationCurve translateXChild = new AnimationCurve(translateXKeysChild.ToArray());
+        newClip.SetCurve(("HandRig_L/MainL_JNT/WristL_JNT", typeof(Transform), "localPosition.x", translateXChild);
+
         return newClip;
-
     }
-
 }

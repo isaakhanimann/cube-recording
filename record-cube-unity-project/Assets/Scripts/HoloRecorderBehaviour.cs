@@ -14,6 +14,10 @@ public class HoloRecorderBehaviour : MonoBehaviour
 
     private bool isRecording;
 
+    public HoloRecorderBehaviour() {
+        objectToRecord = GameObject.Find("Hands");
+    }
+
     public void StartRecording()
     {
         Debug.Log("StartRecording");
@@ -51,7 +55,10 @@ public class HoloRecorderBehaviour : MonoBehaviour
         string path = Application.persistentDataPath + $"/{filename}.txt";
         AllKeyFrames allKeyFrames = new AllKeyFrames(translateXKeys);
         string keyframesAsJson = JsonUtility.ToJson(allKeyFrames, true);
-        File.WriteAllText(path, keyframesAsJson);
+        File.WriteAllText("1" + path, keyframesAsJson);
+        AllKeyFrames allKeyFramesChild = new AllKeyFrames(translateXKeysChild);
+        string keyframesAsJsonChild = JsonUtility.ToJson(allKeyFramesChild, true);
+        File.WriteAllText("2" + path, keyframesAsJsonChild);
         return path;
     }
 
@@ -73,14 +80,26 @@ public class HoloRecorderBehaviour : MonoBehaviour
 
     private float timeOfLastUpdate = 0.0f;
     private List<Keyframe> translateXKeys = new List<Keyframe>();
+    private List<Keyframe> translateXKeysChild = new List<Keyframe>();
 
 
     private void CaptureKeyFrame()
     {
         float timeOfKeyFrame = timeOfLastUpdate + Time.deltaTime;
-        Keyframe newKey = new Keyframe(timeOfKeyFrame, objectToRecord.transform.localPosition.x);
-        translateXKeys.Add(newKey);
-        timeOfLastUpdate += Time.deltaTime;
+        var handJointService = CoreServices.GetInputSystemDataProvider<IMixedRealityHandJointService>();
+        if (handJointService != null)
+        {
+            Transform jointTransform = handJointService.RequestJointTransform(TrackedHandJoint.Palm, Handedness.Left);
+            Keyframe newKey = new Keyframe(timeOfKeyFrame, jointTransform.transform.localPosition.x);
+            translateXKeys.Add(newKey);
+
+            Transform jointTransformChild = handJointService.RequestJointTransform(TrackedHandJoint.Wrist, Handedness.Left);
+            Keyframe newKeyChild = new Keyframe(timeOfKeyFrame, jointTransformChild.transform.localPosition.x);
+            translateXKeysChild.Add(newKeyChild);
+            
+            timeOfLastUpdate += Time.deltaTime;
+        }
+      
     }
 
 
