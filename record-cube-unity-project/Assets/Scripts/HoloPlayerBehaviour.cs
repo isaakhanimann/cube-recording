@@ -98,7 +98,7 @@ public class HoloPlayerBehaviour : MonoBehaviour
         newClip.SetCurve("HandRig_L", typeof(Transform), "localPosition.x", translateX);
     
         AnimationCurve translateXChild = new AnimationCurve(translateXKeysChild.ToArray());
-        newClip.SetCurve(("HandRig_L/MainL_JNT/WristL_JNT", typeof(Transform), "localPosition.x", translateXChild);
+        newClip.SetCurve("HandRig_L/MainL_JNT/WristL_JNT", typeof(Transform), "localPosition.x", translateXChild);
 
         return newClip;
     }
