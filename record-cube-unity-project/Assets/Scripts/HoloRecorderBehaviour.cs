@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-
+using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.Input;
+using Microsoft.MixedReality.Toolkit.Utilities;
 
 //This needs to be a Monobehaviour because we need access to LateUpdate()
 public class HoloRecorderBehaviour : MonoBehaviour
