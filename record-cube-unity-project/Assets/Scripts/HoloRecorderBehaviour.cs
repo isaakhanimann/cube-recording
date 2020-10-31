@@ -52,7 +52,6 @@ public class HoloRecorderBehaviour : MonoBehaviour
         PoseKeyframeLists cubePoses = new PoseKeyframeLists(keyframesPositionX, keyframesPositionY);
         AllKeyFrames allKeyFrames = new AllKeyFrames(cubePoses);
         string keyframesAsJson = JsonUtility.ToJson(allKeyFrames, true);
-        Debug.Log($"keyframesAsJson = {keyframesAsJson}");
         File.WriteAllText(path, keyframesAsJson);
         return path;
     }
@@ -69,7 +68,7 @@ public class HoloRecorderBehaviour : MonoBehaviour
     {
         if (isRecording)
         {
-            CaptureKeyFrame();
+            CaptureKeyFrames();
         }
     }
 
@@ -78,11 +77,11 @@ public class HoloRecorderBehaviour : MonoBehaviour
     private List<SerializableKeyframe> keyframesPositionY = new List<SerializableKeyframe>();
 
 
-    private void CaptureKeyFrame()
+    private void CaptureKeyFrames()
     {
         float timeOfKeyFrame = timeOfLastUpdate + Time.deltaTime;
         SerializableKeyframe newKeyframePositionX = new SerializableKeyframe(timeOfKeyFrame, objectToRecord.transform.localPosition.x);
-        SerializableKeyframe newKeyframePositionY = new SerializableKeyframe(timeOfKeyFrame, objectToRecord.transform.localPosition.x);
+        SerializableKeyframe newKeyframePositionY = new SerializableKeyframe(timeOfKeyFrame, objectToRecord.transform.localPosition.y);
         keyframesPositionX.Add(newKeyframePositionX);
         keyframesPositionY.Add(newKeyframePositionY);
         timeOfLastUpdate += Time.deltaTime;

@@ -81,13 +81,28 @@ public class HoloPlayerBehaviour : MonoBehaviour
     {
         List<Keyframe> keyframesX = GetKeyframes(allKeyFrames.cubePoses.keyframesPositionX);
         List<Keyframe> keyframesY = GetKeyframes(allKeyFrames.cubePoses.keyframesPositionY);
+        Debug.Log($"First changing x keyframe at time: {GetTimeOfFirstChangingValue(keyframesX)}");
+        Debug.Log($"First changing y keyframe at time: {GetTimeOfFirstChangingValue(keyframesY)}");
+
         AnimationCurve translateX = new AnimationCurve(keyframesX.ToArray());
         AnimationCurve translateY = new AnimationCurve(keyframesY.ToArray());
         AnimationClip newClip = new AnimationClip();
         newClip.SetCurve("", typeof(Transform), "localPosition.x", translateX);
         newClip.SetCurve("", typeof(Transform), "localPosition.y", translateY);
         return newClip;
+    }
 
+    private float GetTimeOfFirstChangingValue(List<Keyframe> keyframes)
+    {
+        float firstValue = keyframes[0].value;
+        foreach (Keyframe key in keyframes)
+        {
+            if (key.value != firstValue)
+            {
+                return key.time;
+            }
+        }
+        return 99;
     }
 
 
