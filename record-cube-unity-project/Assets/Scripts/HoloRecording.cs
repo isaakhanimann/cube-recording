@@ -19,28 +19,24 @@ public struct HoloRecording
 [System.Serializable]
 public class AllKeyFrames
 {
-    public List<SerializableKeyframe> serializableKeyframes;
+    public PoseKeyframeLists cubePoses;
 
-    public AllKeyFrames(List<Keyframe> keyframes)
+    public AllKeyFrames(PoseKeyframeLists cubePoses)
     {
-        serializableKeyframes = new List<SerializableKeyframe>();
-        for (int index = 0; index < keyframes.Count; index++)
-        {
-            Keyframe key = keyframes[index];
-            serializableKeyframes.Add(new SerializableKeyframe(key));
-        }
+        this.cubePoses = cubePoses;
     }
+}
 
-    public List<Keyframe> GetKeyframes()
+[System.Serializable]
+public class PoseKeyframeLists
+{
+    public List<SerializableKeyframe> keyframesPositionX;
+    public List<SerializableKeyframe> keyframesPositionY;
+
+    public PoseKeyframeLists(List<SerializableKeyframe> keyframesPositionX, List<SerializableKeyframe> keyframesPositionY)
     {
-        List<Keyframe> keyframes = new List<Keyframe>();
-        for (int index = 0; index < serializableKeyframes.Count; index++)
-        {
-            SerializableKeyframe serializableKeyframe = serializableKeyframes[index];
-            keyframes.Add(new Keyframe(serializableKeyframe.time, serializableKeyframe.value));
-        }
-
-        return keyframes;
+        this.keyframesPositionX = keyframesPositionX;
+        this.keyframesPositionY = keyframesPositionY;
     }
 }
 
@@ -48,10 +44,10 @@ public class AllKeyFrames
 [System.Serializable]
 public struct SerializableKeyframe
 {
-    public SerializableKeyframe(Keyframe keyframe)
+    public SerializableKeyframe(float time, float value)
     {
-        this.time = keyframe.time;
-        this.value = keyframe.value;
+        this.time = time;
+        this.value = value;
     }
 
     public Keyframe GetKeyframe()

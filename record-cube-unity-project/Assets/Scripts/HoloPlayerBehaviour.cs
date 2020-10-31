@@ -70,24 +70,37 @@ public class HoloPlayerBehaviour : MonoBehaviour
 
     private AnimationClip GetAnimationClipFromPath(string path)
     {
-        List<Keyframe> keyframes = LoadKeyframes(path);
-        return GetAnimationClipFromRecordedKeyframes(keyframes);
-    }
-
-    private List<Keyframe> LoadKeyframes(string path)
-    {
         string keyframesAsJson = File.ReadAllText(path);
+        Debug.Log(keyframesAsJson);
         AllKeyFrames allKeyFrames = JsonUtility.FromJson<AllKeyFrames>(keyframesAsJson);
-        return allKeyFrames.GetKeyframes();
+        return GetAnimationClipFromRecordedKeyframes(allKeyFrames);
     }
 
-    private AnimationClip GetAnimationClipFromRecordedKeyframes(List<Keyframe> translateXKeys)
+
+    private AnimationClip GetAnimationClipFromRecordedKeyframes(AllKeyFrames allKeyFrames)
     {
-        AnimationCurve translateX = new AnimationCurve(translateXKeys.ToArray());
+        List<Keyframe> keyframesX = GetKeyframes(allKeyFrames.cubePoses.keyframesPositionX);
+        List<Keyframe> keyframesY = GetKeyframes(allKeyFrames.cubePoses.keyframesPositionY);
+        AnimationCurve translateX = new AnimationCurve(keyframesX.ToArray());
+        AnimationCurve translateY = new AnimationCurve(keyframesY.ToArray());
         AnimationClip newClip = new AnimationClip();
         newClip.SetCurve("", typeof(Transform), "localPosition.x", translateX);
+        newClip.SetCurve("", typeof(Transform), "localPosition.y", translateY);
         return newClip;
 
+    }
+
+
+    private List<Keyframe> GetKeyframes(List<SerializableKeyframe> serializableKeyframes)
+    {
+        List<Keyframe> keyframes = new List<Keyframe>();
+        for (int index = 0; index < serializableKeyframes.Count; index++)
+        {
+            SerializableKeyframe serializableKeyframe = serializableKeyframes[index];
+            keyframes.Add(new Keyframe(serializableKeyframe.time, serializableKeyframe.value));
+        }
+
+        return keyframes;
     }
 
 }

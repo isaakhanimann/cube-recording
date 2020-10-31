@@ -49,8 +49,10 @@ public class HoloRecorderBehaviour : MonoBehaviour
     private string SaveKeyframes(string filename)
     {
         string path = Application.persistentDataPath + $"/{filename}.txt";
-        AllKeyFrames allKeyFrames = new AllKeyFrames(translateXKeys);
+        PoseKeyframeLists cubePoses = new PoseKeyframeLists(keyframesPositionX, keyframesPositionY);
+        AllKeyFrames allKeyFrames = new AllKeyFrames(cubePoses);
         string keyframesAsJson = JsonUtility.ToJson(allKeyFrames, true);
+        Debug.Log($"keyframesAsJson = {keyframesAsJson}");
         File.WriteAllText(path, keyframesAsJson);
         return path;
     }
@@ -72,21 +74,24 @@ public class HoloRecorderBehaviour : MonoBehaviour
     }
 
     private float timeOfLastUpdate = 0.0f;
-    private List<Keyframe> translateXKeys = new List<Keyframe>();
+    private List<SerializableKeyframe> keyframesPositionX = new List<SerializableKeyframe>();
+    private List<SerializableKeyframe> keyframesPositionY = new List<SerializableKeyframe>();
 
 
     private void CaptureKeyFrame()
     {
         float timeOfKeyFrame = timeOfLastUpdate + Time.deltaTime;
-        Keyframe newKey = new Keyframe(timeOfKeyFrame, objectToRecord.transform.localPosition.x);
-        translateXKeys.Add(newKey);
+        SerializableKeyframe newKeyframePositionX = new SerializableKeyframe(timeOfKeyFrame, objectToRecord.transform.localPosition.x);
+        SerializableKeyframe newKeyframePositionY = new SerializableKeyframe(timeOfKeyFrame, objectToRecord.transform.localPosition.x);
+        keyframesPositionX.Add(newKeyframePositionX);
+        keyframesPositionY.Add(newKeyframePositionY);
         timeOfLastUpdate += Time.deltaTime;
     }
 
 
     private void ResetRecorder()
     {
-        translateXKeys = new List<Keyframe>();
+        keyframesPositionX = new List<SerializableKeyframe>();
         timeOfLastUpdate = 0.0f;
     }
 
